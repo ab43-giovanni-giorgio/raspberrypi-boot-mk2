@@ -1,0 +1,35 @@
+#
+# Boot Raspberry Pis into becoming storage disks.
+#
+# Limitation:
+#   So far only tested on Raspberry Pi: Zero and CM3/3+
+#
+
+# Raspberry Pi Zero: Stage 1.
+ACTION=="add", \
+SUBSYSTEM=="usb", \
+ATTRS{idVendor}=="0a5c", ATTRS{idProduct}=="2763", \
+RUN+="/usr/local/bin/raspberrypi-boot-mk2 $attr{idVendor} $attr{idProduct}"
+
+# Raspberry Pi Zero: Stage 2. 
+# Compute Module 3/3+: Stage 1 and 2.
+ACTION=="add", \
+SUBSYSTEM=="usb", \
+ATTRS{idVendor}=="0a5c", ATTRS{idProduct}=="2764", \
+RUN+="/usr/local/bin/raspberrypi-boot-mk2 $attr{idVendor} $attr{idProduct}"
+
+#
+# Create dedicated symlinks for Raspberry Pis.
+# e.g. /dev/sda is linked to via /dev/raspberrypi0.
+#
+# Limitation:   
+#    Max 10 Raspberry Pis will get assigned 
+#    pretty symlink "raspberrypi0", "raspberrypi1" ...
+#
+
+ACTION=="add|change", \
+SUBSYSTEMS=="scsi", KERNEL=="sd[a-j]", \
+ATTRS{vendor}=="RPi-MSD-", \
+IMPORT{program}="/bin/sh -c 'echo RPI_NUM=$(echo %k | cut -c 3 | tr [a-j] [0-9])'" \
+SYMLINK+="raspberrypi$env{RPI_NUM}", 
+
