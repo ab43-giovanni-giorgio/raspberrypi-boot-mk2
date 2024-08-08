@@ -2,6 +2,11 @@
 
 typedef struct libusb_device_descriptor libusb_device_descriptor;
 
+int
+usb_id(
+    char* string
+);
+
 void
 usb_init(
     libusb_context **context,

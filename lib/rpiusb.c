@@ -1,9 +1,69 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "rpiusb.h"
 
+#define ID_LEN          4
 #define TIMEOUT         100     // 0.1 seconds
 #define TIMEOUT_BULK    10000   //  10 seconds
+
+int
+usb_id(
+    char* string
+){
+    // Note:
+    //  String has to be supplied without the preceeding 0x hex designator.
+
+    int length = 0;
+
+    length = strlen(string);
+
+    if(ID_LEN != length){
+        fprintf(
+            stderr, 
+            "Error. USB VID/PID string should be %d characters long. " 
+            "Got %d characters long string instead: \"%s\".\n", 
+            ID_LEN, length, string
+        );
+        return -1;
+    }
+
+    for(int i = 0; i < length; i++){
+
+        string[i] = tolower(string[i]);
+
+        switch (string[i]){
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+                break;
+            
+            default:
+                fprintf(
+                    stderr, 
+                    "Error. Detected non hex value: %c in the string: %s\n", 
+                    string[i], string
+                );
+                return -1;
+        }
+    }
+
+    return (int) strtol(string, NULL, 16);
+}
 
 void 
 usb_init(

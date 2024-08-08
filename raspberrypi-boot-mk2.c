@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -111,54 +110,15 @@ void stage2(
     }
 }
 
-int str_to_hex(char* string){
-
-    for(int i = 0; i < strlen(string); i++){
-
-        // Standardize
-        string[i] = tolower(string[i]);
-
-        // Check if hex value
-        switch (string[i]){
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case 'a':
-            case 'b':
-            case 'c':
-            case 'd':
-            case 'e':
-            case 'f':
-                break;
-            
-            default:
-                fprintf(
-                    stderr, 
-                    "Error. Detected non hex value: %c in the string: %s\n", string[i], string
-                );
-                return -1;
-        }
-    }
-    
-    return (int) strtol(string, NULL, 16);
-}
-
 int main(int argc, char **argv){
 
-    if(argc != 3 || 4 != strlen(argv[1]) || 4 != strlen(argv[2])){
+    if(argc != 3){
         help(argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    int vid = str_to_hex(argv[1]);
-    int pid = str_to_hex(argv[2]);
+    int vid = usb_id(argv[1]);
+    int pid = usb_id(argv[2]);
 
     if(-1 == vid || -1 == pid)
         exit(EXIT_FAILURE);
